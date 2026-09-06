@@ -1,0 +1,6 @@
+{
+  "name": "PenguinMod",
+  "description": "Port offline del editor de PenguinMod para crear juegos y animaciones con bloques, extensiones y controles táctiles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PenguinMod Offline Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Top Navigation Bar -->
+    <header id="top-bar">
+      <div class="brand-group">
+        <div class="brand-icon" title="PenguinMod">
+          <img src="assets/icons/penguinmod_192.png" alt="PenguinMod" class="penguin-brand-img" />
+        </div>
+        <span class="brand-title">Penguin<span class="brand-accent">Mod</span></span>
+        <span class="badge-offline" title="100% Offline Port">OFFLINE</span>
+      </div>
+
+      <!-- Project Name Input -->
+      <div class="project-title-container">
+        <input type="text" id="project-name" value="Mi Proyecto Penguin" placeholder="Nombre del proyecto" spellcheck="false" />
+      </div>
+
+      <!-- Execution Controls -->
+      <div class="run-controls">
+        <button id="btn-green-flag" class="ctrl-btn green-flag" title="Ejecutar proyecto (Bandera Verde)">
+          <img src="assets/icons/flag.svg" width="20" height="20" alt="Bandera Verde" />
+        </button>
+        <button id="btn-pause" class="ctrl-btn pause-btn" title="Pausar / Reanudar">
+          <img src="assets/icons/pause.svg" width="18" height="18" alt="Pausar" />
+        </button>
+        <button id="btn-stop" class="ctrl-btn stop-btn" title="Detener todo">
+          <img src="assets/icons/stop.svg" width="18" height="18" alt="Detener" />
+        </button>
+        <button id="btn-turbo" class="ctrl-pill" title="Modo Turbo (sin retraso de fotogramas)">
+          <span class="turbo-indicator"></span> TURBO
+        </button>
+        <div id="fps-counter" class="fps-pill" title="Tasa de cuadros por segundo">60 FPS</div>
+      </div>
+
+      <!-- Header Menus & Actions -->
+      <div class="menu-actions">
+        <div class="dropdown">
+          <button class="menu-btn" id="btn-file-menu">📁 Archivo ▾</button>
+          <div class="dropdown-content" id="file-dropdown">
+            <a href="#" id="menu-new-project">📄 Nuevo Proyecto</a>
+            <a href="#" id="menu-save-pmp">💾 Guardar en Dispositivo (.pmp)</a>
+            <a href="#" id="menu-load-pmp">📂 Abrir Archivo (.pmp / .sb3)</a>
+            <div class="menu-separator"></div>
+            <span class="dropdown-header">Proyectos de Ejemplo:</span>
+            <a href="#" id="load-sample-platformer">🎮 Penguin Aventura (Plataformas)</a>
+            <a href="#" id="load-sample-space">🚀 Nave Espacial Penguin (Shooter)</a>
+            <a href="#" id="load-sample-canvas">🎨 Fuegos Artificiales (Canvas+)</a>
+            <a href="#" id="load-sample-clicker">🍪 Penguin Clicker Deluxe</a>
+            <a href="#" id="load-sample-physics">⚡ Laboratorio de Física</a>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="menu-btn" id="btn-edit-menu">⚙️ Opciones ▾</button>
+          <div class="dropdown-content" id="edit-dropdown">
+            <a href="#" id="menu-toggle-fps">🔄 Cambiar FPS (30 / 60 / 120)</a>
+            <a href="#" id="menu-toggle-hqpen">🖋️ Lápiz Alta Calidad (HQ Pen)</a>
+            <a href="#" id="menu-toggle-turbo">⚡ Alternar Modo Turbo</a>
+            <a href="#" id="menu-clean-blocks">🧹 Ordenar Bloques</a>
+            <a href="#" id="menu-clear-workspace">🗑️ Limpiar Área de Código</a>
+          </div>
+        </div>
+
+        <button id="btn-gamepad-toggle" class="icon-toggle-btn active" title="Alternar Controles Táctiles (D-Pad / Botones)">
+          🎮 Controles
+        </button>
+
+        <button id="btn-fullscreen-stage" class="icon-toggle-btn" title="Pantalla Completa Escenario">
+          <img src="assets/icons/fullscreen.svg" width="14" height="14" alt="" /> Escenario
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <div id="workspace-tabs-bar">
+      <div class="tab-item active" data-tab="code">
+        <img src="assets/icons/tab_code.svg" class="tab-svg-icon" alt="" /> Código
+      </div>
+      <div class="tab-item" data-tab="costumes">
+        <img src="assets/icons/tab_costumes.svg" class="tab-svg-icon" alt="" /> Disfraces
+      </div>
+      <div class="tab-item" data-tab="sounds">
+        <img src="assets/icons/tab_sounds.svg" class="tab-svg-icon" alt="" /> Sonidos
+      </div>
+      <div class="tab-item" data-tab="extensions">
+        <img src="assets/icons/tab_extensions.svg" class="tab-svg-icon" alt="" /> Extensiones
+      </div>
+      <div class="tab-item" data-tab="examples">
+        <img src="assets/icons/tab_files.svg" class="tab-svg-icon" alt="" /> Galería
+      </div>
+    </div>
+
+    <!-- Main Body Area -->
+    <main id="main-area">
+      <!-- Left Panel: Code Workspace / Costumes / Sounds / Extensions -->
+      <section id="editor-pane">
+        <!-- CODE TAB VIEW -->
+        <div id="tab-code-view" class="tab-view active">
+          <!-- Block Categories Sidebar -->
+          <div id="category-sidebar">
+            <div class="cat-btn active" data-cat="motion" style="--cat-color: #4C97FF;">
+              <div class="cat-circle"><img src="assets/icons/cat_motion.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Movimiento</span>
+            </div>
+            <div class="cat-btn" data-cat="looks" style="--cat-color: #9966FF;">
+              <div class="cat-circle"><img src="assets/icons/cat_looks.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Apariencia</span>
+            </div>
+            <div class="cat-btn" data-cat="sound" style="--cat-color: #CF63CF;">
+              <div class="cat-circle"><img src="assets/icons/cat_sound.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Sonido</span>
+            </div>
+            <div class="cat-btn" data-cat="events" style="--cat-color: #FFBF00;">
+              <div class="cat-circle"><img src="assets/icons/cat_events.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Eventos</span>
+            </div>
+            <div class="cat-btn" data-cat="control" style="--cat-color: #FFAB19;">
+              <div class="cat-circle"><img src="assets/icons/cat_control.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Control</span>
+            </div>
+            <div class="cat-btn" data-cat="sensing" style="--cat-color: #5CB1D6;">
+              <div class="cat-circle"><img src="assets/icons/cat_sensing.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Sensores</span>
+            </div>
+            <div class="cat-btn" data-cat="operators" style="--cat-color: #59C059;">
+              <div class="cat-circle"><img src="assets/icons/cat_operators.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Operadores</span>
+            </div>
+            <div class="cat-btn" data-cat="variables" style="--cat-color: #FF8C1A;">
+              <div class="cat-circle"><img src="assets/icons/cat_variables.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Variables</span>
+            </div>
+            <!-- PenguinMod Special Categories -->
+            <div class="cat-divider">PenguinMod</div>
+            <div class="cat-btn" data-cat="canvas" style="--cat-color: #0fbd8c;">
+              <div class="cat-circle"><img src="assets/extensions/canvas_icon.png" class="cat-icon-svg" alt="" /></div>
+              <span>Canvas+</span>
+            </div>
+            <div class="cat-btn" data-cat="physics" style="--cat-color: #e64a19;">
+              <div class="cat-circle"><img src="assets/extensions/physics_icon.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Física 2D</span>
+            </div>
+            <div class="cat-btn" data-cat="device" style="--cat-color: #00c3ff;">
+              <div class="cat-circle"><img src="assets/extensions/gamepad_icon.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Móvil/Touch</span>
+            </div>
+            <div class="cat-btn" data-cat="mathplus" style="--cat-color: #00838f;">
+              <div class="cat-circle"><img src="assets/icons/cat_operators.svg" class="cat-icon-svg" alt="" /></div>
+              <span>SharkPool</span>
+            </div>
+            <div class="cat-btn" data-cat="storage" style="--cat-color: #795548;">
+              <div class="cat-circle"><img src="assets/extensions/files_icon.svg" class="cat-icon-svg" alt="" /></div>
+              <span>Archivos</span>
+            </div>
+          </div>
+
+          <!-- Block Palette (Scrollable list of available blocks) -->
+          <div id="block-palette">
+            <div class="palette-header">
+              <span id="palette-title">Bloques de Movimiento</span>
+              <span class="palette-hint">Toca o arrastra al área de código</span>
+            </div>
+            <div id="palette-blocks-list">
+              <!-- Dynamically populated by blocks.js -->
+            </div>
+          </div>
+
+          <!-- Script Workspace Area -->
+          <div id="workspace-container">
+            <div class="workspace-toolbar">
+              <span class="ws-sprite-name" id="ws-current-sprite-name">Sprite: Penguin</span>
+              <div class="ws-actions">
+                <button id="btn-add-comment" class="ws-tool-btn" title="Añadir Nota">+ Nota</button>
+                <button id="btn-run-selection" class="ws-tool-btn primary" title="Probar scripts seleccionados">▶ Probar</button>
+                <button id="btn-clear-scripts" class="ws-tool-btn danger" title="Borrar código de este objeto">Limpiar</button>
+              </div>
+            </div>
+            <div id="workspace-canvas" class="blocks-workspace">
+              <!-- Blocks stack placed here -->
+              <div id="blocks-dropzone" class="blocks-dropzone"></div>
+              <div id="workspace-empty-hint" class="empty-hint">
+                <p>💡 Arrastra o toca bloques de la izquierda para añadirlos aquí.</p>
+                <p>Pulsa la <strong>Bandera Verde</strong> para ejecutar tu juego.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COSTUMES TAB VIEW -->
+        <div id="tab-costumes-view" class="tab-view">
+          <div class="costumes-layout">
+            <div class="costumes-sidebar">
+              <div class="costumes-header">Disfraces</div>
+              <div id="costumes-list">
+                <!-- Populated dynamically -->
+              </div>
+              <button id="btn-add-costume" class="add-item-btn">+ Nuevo Disfraz</button>
+            </div>
+            <div class="costumes-editor-area">
+              <div class="paint-toolbar">
+                <button class="tool-btn active" data-tool="brush" title="Pincel">✏️ Lápiz</button>
+                <button class="tool-btn" data-tool="eraser" title="Borrador">🧹 Borrador</button>
+                <button class="tool-btn" data-tool="circle" title="Círculo">⭕ Círculo</button>
+                <button class="tool-btn" data-tool="rect" title="Rectángulo">⬛ Rectángulo</button>
+                <input type="color" id="paint-color" value="#00c3ff" title="Color" />
+                <label>Tamaño: <input type="range" id="paint-size" min="2" max="40" value="8" /></label>
+                <button id="btn-clear-paint" class="tool-btn danger">Borrar Todo</button>
+              </div>
+              <div class="paint-canvas-wrap">
+                <canvas id="costume-canvas" width="300" height="300"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOUNDS TAB VIEW -->
+        <div id="tab-sounds-view" class="tab-view">
+          <div class="sounds-layout">
+            <div class="sounds-sidebar">
+              <div class="sounds-header">Efectos de Sonido Retro</div>
+              <div id="sounds-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+            <div class="sounds-preview-area">
+              <div class="sound-waveform-card">
+                <h3 id="current-sound-title">Sonido: Salto Arcade</h3>
+                <canvas id="sound-visualizer" width="400" height="120"></canvas>
+                <div class="sound-controls">
+                  <button id="btn-play-sound" class="ctrl-btn green-flag">▶ Reproducir</button>
+                  <button id="btn-pitch-up" class="ws-tool-btn">Agudo ↑</button>
+                  <button id="btn-pitch-down" class="ws-tool-btn">Grave ↓</button>
+                  <button id="btn-sound-echo" class="ws-tool-btn">Efecto Eco</button>
+                </div>
+              </div>
+              <div class="sound-library-grid">
+                <h4>Biblioteca de Sonidos PenguinMod (100% Offline):</h4>
+                <div class="sound-chips" id="sound-chips-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXTENSIONS TAB VIEW -->
+        <div id="tab-extensions-view" class="tab-view">
+          <div class="extensions-layout">
+            <div class="ext-header">
+              <h2>Biblioteca de Extensiones Offline de PenguinMod</h2>
+              <p>Habilita capacidades avanzadas que no existen en Scratch tradicional sin necesidad de internet.</p>
+            </div>
+            <div class="extensions-grid" id="extensions-grid-container">
+              <!-- Injected by extensions.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAMPLES GALLERY TAB VIEW -->
+        <div id="tab-examples-view" class="tab-view">
+          <div class="examples-layout">
+            <div class="examples-header">
+              <h2>Proyectos de Ejemplo Interactivos</h2>
+              <p>Carga y juega proyectos completos creados con bloques de PenguinMod.</p>
+            </div>
+            <div class="examples-grid" id="examples-grid-container">
+              <!-- Injected by projects.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Stage & Sprites Inspector -->
+      <section id="stage-pane">
+        <!-- Stage Viewport -->
+        <div id="stage-wrapper">
+          <canvas id="stage-canvas" width="480" height="360"></canvas>
+          <div id="speech-bubble" class="speech-bubble hidden"></div>
+          
+          <!-- Virtual Touch Gamepad Overlay (Toggleable for mobile gaming!) -->
+          <div id="virtual-gamepad" class="virtual-gamepad">
+            <div class="dpad-cluster">
+              <button class="dpad-btn up" data-key="ArrowUp" title="Arriba">▲</button>
+              <div class="dpad-mid-row">
+                <button class="dpad-btn left" data-key="ArrowLeft" title="Izquierda">◀</button>
+                <div class="dpad-center">●</div>
+                <button class="dpad-btn right" data-key="ArrowRight" title="Derecha">▶</button>
+              </div>
+              <button class="dpad-btn down" data-key="ArrowDown" title="Abajo">▼</button>
+            </div>
+            <div class="action-cluster">
+              <button class="action-btn btn-b" data-key="x" title="Botón X / Disparo">B</button>
+              <button class="action-btn btn-a" data-key=" " title="Espacio / Salto">A</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sprite Inspector & Sprites Bar -->
+        <div id="sprites-manager">
+          <div class="sprite-props-bar">
+            <div class="prop-item">
+              <label>Objeto:</label>
+              <input type="text" id="sprite-prop-name" value="Penguin" />
+            </div>
+            <div class="prop-item">
+              <label>X:</label>
+              <input type="number" id="sprite-prop-x" value="0" />
+            </div>
+            <div class="prop-item">
+              <label>Y:</label>
+              <input type="number" id="sprite-prop-y" value="0" />
+            </div>
+            <div class="prop-item">
+              <label>Dirección:</label>
+              <input type="number" id="sprite-prop-dir" value="90" />
+            </div>
+            <div class="prop-item">
+              <label>Tamaño (%):</label>
+              <input type="number" id="sprite-prop-size" value="100" />
+            </div>
+            <div class="prop-item">
+              <label>Visible:</label>
+              <input type="checkbox" id="sprite-prop-visible" checked />
+            </div>
+          </div>
+
+          <div class="sprites-collection-row">
+            <div class="sprites-list" id="sprites-list-container">
+              <!-- Sprites cards injected here -->
+            </div>
+            <button id="btn-add-sprite" class="sprite-add-btn" title="Añadir nuevo Objeto">
+              + Objeto
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Hidden File Input for loading .pmp or .sb3 projects -->
+    <input type="file" id="file-importer" accept=".pmp,.sb3,.json" style="display: none;" />
+  </div>
+
+  <!-- PenguinMod Scripts Bundle -->
+  <script src="runtime.js"></script>
+  <script src="blocks.js"></script>
+  <script src="extensions.js"></script>
+  <script src="projects.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

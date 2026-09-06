@@ -1,0 +1,15 @@
+{
+  "name": "PenguinMod",
+  "short_name": "PenguinMod",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#00c3ff",
+  "theme_color": "#00c3ff",
+  "icons": [
+    {
+      "src": "assets/icons/penguinmod_logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
