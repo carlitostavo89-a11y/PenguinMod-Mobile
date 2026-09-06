@@ -147,6 +147,9 @@ class MainActivity : ComponentActivity() {
                 val isFullscreen by viewModel.isFullscreen.collectAsState()
                 val savedProjects by viewModel.savedProjects.collectAsState()
 
+                val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+                val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
                 var showProjectsDialog by remember { mutableStateOf(false) }
                 var showAboutDialog by remember { mutableStateOf(false) }
                 var pendingSaveDialogData by remember { mutableStateOf<Pair<String, String>?>(null) } // (filename, base64)
@@ -164,7 +167,7 @@ class MainActivity : ComponentActivity() {
                             PenguinTopBar(
                                 onToggleFullscreen = { viewModel.toggleFullscreen() },
                                 onToggleOrientation = { toggleOrientation() },
-                                isLandscape = isLandscapeState,
+                                isLandscape = isLandscape,
                                 onSaveAs = {
                                     webViewRef?.evaluateJavascript(
                                         "if(window.penguinApp) window.penguinApp.triggerSaveAs();",
@@ -209,22 +212,40 @@ class MainActivity : ComponentActivity() {
                             }
                         )
 
-                        // Floating toggle button when in fullscreen
+                        // Floating toggle buttons when in fullscreen
                         if (isFullscreen) {
-                            IconButton(
-                                onClick = { viewModel.toggleFullscreen() },
+                            androidx.compose.foundation.layout.Row(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(8.dp)
-                                    .size(40.dp)
-                                    .background(Color(0x88000000), androidx.compose.foundation.shape.CircleShape)
-                                    .testTag("exit_fullscreen_fab")
+                                    .padding(8.dp),
+                                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.FullscreenExit,
-                                    contentDescription = "Salir de pantalla completa",
-                                    tint = PenguinCyan
-                                )
+                                IconButton(
+                                    onClick = { toggleOrientation() },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color(0x88000000), androidx.compose.foundation.shape.CircleShape)
+                                        .testTag("fullscreen_rotate_button")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ScreenRotation,
+                                        contentDescription = "Cambiar orientación",
+                                        tint = if (isLandscape) PenguinYellow else Color.White
+                                    )
+                                }
+                                IconButton(
+                                    onClick = { viewModel.toggleFullscreen() },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color(0x88000000), androidx.compose.foundation.shape.CircleShape)
+                                        .testTag("exit_fullscreen_fab")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.FullscreenExit,
+                                        contentDescription = "Salir de pantalla completa",
+                                        tint = PenguinCyan
+                                    )
+                                }
                             }
                         }
                     }
@@ -288,14 +309,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun toggleOrientation() {
-        val target = if (isLandscapeState) {
+        val currentIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        requestedOrientation = if (currentIsLandscape) {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         } else {
-            ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
-        requestedOrientation = target
-        isLandscapeState = !isLandscapeState
-        val msg = if (isLandscapeState) "Modo horizontal (paisaje)" else "Modo vertical"
+        val msg = if (!currentIsLandscape) "Modo horizontal activado" else "Modo vertical activado"
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -451,6 +471,10 @@ fun PenguinWebView(
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
 
+                isVerticalScrollBarEnabled = true
+                isHorizontalScrollBarEnabled = true
+                isScrollbarFadingEnabled = true
+
                 settings.apply {
                     javaScriptEnabled = true
                     domStorageEnabled = true
@@ -463,7 +487,8 @@ fun PenguinWebView(
                     loadWithOverviewMode = true
                     cacheMode = WebSettings.LOAD_DEFAULT
                     mediaPlaybackRequiresUserGesture = false
-                    builtInZoomControls = false
+                    setSupportZoom(true)
+                    builtInZoomControls = true
                     displayZoomControls = false
                     mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 }

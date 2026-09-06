@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.25, maximum-scale=5.0, user-scalable=yes">
   <meta name="google" value="notranslate">
   <meta name="description" content="PenguinMod is a TurboWarp mod that was made to add tons of cool stuff to allow for crazy projects."/>
   <title>PenguinMod - Editor</title>
@@ -15,7 +15,10 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden;
+      min-width: 100%;
+      min-height: 100%;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
       background-color: #0b1017;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
@@ -107,6 +110,34 @@
       }
 
       // Intercept file downloads from PenguinMod (such as File -> Save to your computer / Guardar como)
+      if (!window.showSaveFilePicker) {
+        window.showSaveFilePicker = async function(options) {
+          var suggestedName = (options && options.suggestedName) || 'Mi_Proyecto.pmp';
+          return {
+            name: suggestedName,
+            createWritable: async function() {
+              var chunks = [];
+              return {
+                write: async function(data) {
+                  chunks.push(data);
+                },
+                close: async function() {
+                  var blob = new Blob(chunks);
+                  var reader = new FileReader();
+                  reader.onload = function() {
+                    if (window.AndroidPenguin && window.AndroidPenguin.onSaveAsTriggered) {
+                      window.AndroidPenguin.onSaveAsTriggered(suggestedName, reader.result);
+                    }
+                  };
+                  reader.readAsDataURL(blob);
+                },
+                abort: async function() {}
+              };
+            }
+          };
+        };
+      }
+
       var originalAnchorClick = HTMLAnchorElement.prototype.click;
       HTMLAnchorElement.prototype.click = function() {
         if (this.download && this.href) {
